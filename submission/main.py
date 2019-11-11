@@ -41,17 +41,121 @@ def deleteuser():
         query = "SELECT fname FROM customer WHERE cid=%d"
         cur.execute(query, (cid,))
         name = cur.fetchall()
+        #delete from customer table
         query = "DELETE FROM customer WHERE cid=%d"
         cur.execute(query, (cid,))
         con.commit()
+        #delete from from custguard
+        query = "DELETE FROM custguard WHERE cid=%d"
+        cur.execute(query, (cid,))
+        con.commit()
+
+        #delete from from drinktrans
+        query = "DELETE FROM drinktrans WHERE cid=%d"
+        cur.execute(query, (cid,))
+        con.commit()
+
+        #delete from from lovestogoto
+        query = "DELETE FROM lovestogoto WHERE cid=%d"
+        cur.execute(query, (cid,))
+        con.commit()
+
+        #adding in old customer
         query = "INSERT INTO oldcustomer(cid) VALUES('%s')" %(name)
-        cur.execute(query,)
-        con.commit();
+        cur.execute(query)
+        con.commit()
+
 
     except Exception as e:
         con.rollback()
-        print("Failed to delete into database")
+        print("Failed to delete from database")
         print (">>>>>>>>>>>>>", e)
+
+    return
+
+
+
+def modifycustomer():
+    try:
+        cid = input("Enter the Customer ID : ")
+        field = input("Enter the Attribute to modify : ")
+        if field=="cid":
+            print("Can't Change cid : It is Primary Key")
+            return
+        value = input("Enter the Attribute Value")
+        data = (field, value,cid)
+        query = "UPDATE customer SET %s=%s WHERE cid=%d"
+        cur.execute(query,data)
+        con.commit()
+    except Exception as e:
+        con.rollback()
+        print("Failed to Update")
+        print (">>>>>>>>>>>>>", e)
+
+    return
+
+
+def modifybar():
+    try:
+        bid = input("Enter the Bar ID : ")
+        field = input("Enter the Attribute to modify : ")
+        if field=="bid":
+            print("Can't Change bar id : It is Primary Key")
+            return
+        value = input("Enter the Attribute Value")
+        data = (field, value,bid)
+        query = "UPDATE bar SET %s=%s WHERE cid=%d"
+        cur.execute(query,data)
+        con.commit()
+    except Exception as e:
+        con.rollback()
+        print("Failed to Update")
+        print (">>>>>>>>>>>>>", e)
+
+    return
+
+def modifyBarManager():
+    try:
+        bid = input("Enter the Bar ID : ")
+        field = input("Enter the Attribute to modify : ")
+        if field=="bid":
+            print("Can't Change bar id : It is Primary Key")
+            return
+        if field=="name":
+            print("Can't Change name : It is Primary Key")
+            return
+        value = input("Enter the Attribute Value")
+        data = (field, value,bid)
+        query = "UPDATE bar_manager SET %s=%s WHERE cid=%d"
+        cur.execute(query,data)
+        con.commit()
+    except Exception as e:
+        con.rollback()
+        print("Failed to Update")
+        print (">>>>>>>>>>>>>", e)
+
+    return
+
+
+
+def cust_report():
+    query = "SELECT * FROM customer"
+    cur.execute(query,data)
+    data = cur.fetchall()
+    print(data)
+
+def bar_report():
+    query = "SELECT * FROM bar"
+    cur.execute(query,data)
+    data = cur.fetchall()
+    print(data)
+
+def old_cust_report():
+    query = "SELECT * FROM old_customer"
+    cur.execute(query,data)
+    data = cur.fetchall()
+    print(data)
+
 
 
 
