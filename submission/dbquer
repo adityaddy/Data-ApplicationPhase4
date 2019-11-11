@@ -1,0 +1,88 @@
+CREATE TABLE `customer` (
+  `cid` int NOT NULL,
+  `fav_drink_name` varchar(100) NULL,
+  `dob` date NOT NULL,
+  `fname` varchar(100) NOT NULL,
+  `lname` varchar(100) NOT NULL,
+  PRIMARY KEY (`cid`),
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `drinks` (
+  `dname` varchar(100) NOT NULL,
+  `max_demand_bid` int NULL,
+  `price` int NULL,
+  `winebrand` varchar(100) NULL,
+  `beerbrand` varchar(100) NULL,
+  PRIMARY KEY (`dname`),
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `bar_manager` (
+  `bid` int NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `dname` varchar(100) NULL,
+  PRIMARY KEY (`bid`,`name`),
+  CONSTRAINT `manages` FOREIGN KEY (`bid`) REFERENCES `bar` (`bid`),
+  CONSTRAINT `sells` FOREIGN KEY (`dname`) REFERENCES `drinks` (`dname`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `bar` (
+  `bid` int NOT NULL,
+  `bname` varchar(100) NOT NULL,
+  `address` varchar(100) NULL,
+  PRIMARY KEY (`bid`),
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `lovestogoto` (
+  `cid` int NOT NULL,
+  `bid` int NOT NULL,
+  PRIMARY KEY (`cid`,`bid`),
+  CONSTRAINT `cust` FOREIGN KEY (`cid`) REFERENCES `customer` (`cid`),
+  CONSTRAINT `barr` FOREIGN KEY (`bid`) REFERENCES `bar` (`bid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `drinktrans` (
+  `dname` varchar(100) NOT NULL,
+  `mname` varchar(100) NOT NULL,
+  `bid` int NOT NULL,
+  `cid` int NOT NULL,
+  PRIMARY KEY (`cid`,`bid`,`dname`,`mname`),
+  CONSTRAINT `cust2` FOREIGN KEY (`cid`) REFERENCES `customer` (`cid`),
+  CONSTRAINT `barr2` FOREIGN KEY (`bid`) REFERENCES `bar` (`bid`),
+   CONSTRAINT `manages2` FOREIGN KEY (`mname`) REFERENCES `bar_manager` (`name`),
+    CONSTRAINT `sells2` FOREIGN KEY (`dname`) REFERENCES `drinks` (`dname`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `managercontact` (
+  `bid` int NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `contactno` int NOT NULL,
+  PRIMARY KEY (`name`,`bid`,`contactno`),
+  CONSTRAINT `manages3` FOREIGN KEY (`name`) REFERENCES `bar_manager` (`name`),
+  CONSTRAINT `barr3` FOREIGN KEY (`bid`) REFERENCES `bar_manager` (`bid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `barcontact` (
+  `bid` int NOT NULL,
+  `contactno` int NOT NULL,
+  PRIMARY KEY (`bid`,`contactno`),
+  CONSTRAINT `barr4` FOREIGN KEY (`bid`) REFERENCES `bar` (`bid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `custguard` (
+  `cid` int NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `contactno` int NOT NULL,
+  PRIMARY KEY (`cid`,`name`,`contactno`),
+  CONSTRAINT `guards` FOREIGN KEY (`cid`) REFERENCES `customer` (`cid`),
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+
+
+
+
+
+
+
