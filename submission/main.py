@@ -169,11 +169,18 @@ def callfunc(ch):
     elif(ch==2):
         deleteuser()
     elif(ch==3):
-        func3()
+        modifycustomer()
     elif(ch==4):
-        func4()
+        modifybar()
     elif(ch==5):
-        func5()
+        modifyBarManager()
+    elif(ch==6):
+        cust_report()
+    elif(ch==7):
+        bar_report()
+    elif(ch==8):
+        old_cust_report()
+
     else:
         print("Error: Invalid Option")
 
@@ -197,12 +204,15 @@ while(1):
             cur = con.cursor()
             while(1):
                 tmp = sp.call('clear',shell=True)
-                print("1. function 1")
-                print("2. function 2")
-                print("3. function 3")
-                print("4. function 4")
-                print("5. function 5")
-                print("6. Logout")
+                print("1. Add Customer")
+                print("2. Delete Customer")
+                print("3. Modify Customer")
+                print("4. Modify Bar")
+                print("5. Modify Bar Manager")
+                print("6. Customer Report")
+                print("7. Bar Report")
+                print("8. Old Customer Report")
+                print("9. Logout")
                 ch = int(input("Enter Choice > "))
                 tmp = sp.call('clear', shell=True)
                 if ch==6:
