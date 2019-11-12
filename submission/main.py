@@ -7,19 +7,14 @@ def adduser():
     
     try:
         row = {}
-        q1  = "SELECT * FROM `customer`"
-        cur.execute(q1)
-        cur.fetchall()
-        rc = cur.rowcount
-        row["cid"] = rc+1
         print("Enter new user details: ")
         name = (input("Name (Fname Minit Lname): ")).split(' ')
         row["fname"] = name[0]
         row["lname"] = name[1]
-        row["fav_drink_name"] = input("fav_drink_name: )
+        row["fav_drinkname"] = input("fav_drink_name: ")
         row["dob"] = input("Birth Date (YYYY-MM-DD): ")
 
-        query = "INSERT INTO customer(cid,fname,lname,fav_drink_name,dob) VALUES('%d', '%s', '%s', '%s', '%s')" %(rc, row["fname"], row["lname"], row["fav_drink_name"], row["dob"])
+        query = "INSERT INTO customer(fav_drinkname,dob,fname,lname) VALUES('%s', '%s', '%s', '%s')" %(row['fav_drinkname'],row["dob"],row["fname"], row["lname"])
         cur.execute(query)
         con.commit()
 
@@ -37,33 +32,71 @@ def adduser():
 def deleteuser():
 
     try:
-        cid = input("Enter CID of Customer : ")
-        query = "SELECT fname FROM customer WHERE cid=%d"
-        cur.execute(query, (cid,))
+        cid = int(input("Enter CID of Customer : "))
+        query = "SELECT fname FROM customer WHERE cid=%d" %(cid)
+        cur.execute(query)
         name = cur.fetchall()
-        #delete from customer table
-        query = "DELETE FROM customer WHERE cid=%d"
-        cur.execute(query, (cid,))
-        con.commit()
+        name = name[0]
+        name = name['fname']
+        print("First Name of customer to be deleted ",name)
         #delete from from custguard
-        query = "DELETE FROM custguard WHERE cid=%d"
-        cur.execute(query, (cid,))
-        con.commit()
+        try:
+            query = "DELETE FROM custguard WHERE cid=%d" %(cid)
+            cur.execute(query)
+            con.commit()
+            print("Deleted customer info from custgaurd table")
+        except Exception as e:
+            con.rollback()
+            print("Failed to delete customer info from custgaurd table")
+            print (">>>>>>>>>>>>>", e)
+            
 
         #delete from from drinktrans
-        query = "DELETE FROM drinktrans WHERE cid=%d"
-        cur.execute(query, (cid,))
-        con.commit()
+        try:
+            query = "DELETE FROM drinktrans WHERE cid=%d" %(cid)
+            cur.execute(query)
+            con.commit()
+            print("Deleted customer info from drinktrans table")
+        except Exception as e:
+            #pass
+            con.rollback()
+            print("Failed to delete customer info from drinktrans table")
+            print (">>>>>>>>>>>>>", e)
 
         #delete from from lovestogoto
-        query = "DELETE FROM lovestogoto WHERE cid=%d"
-        cur.execute(query, (cid,))
-        con.commit()
-
+        try:
+            query = "DELETE FROM lovestogoto WHERE cid=%d" %(cid)
+            cur.execute(query)
+            con.commit()
+            print("Deleted customer info from lovestogoto table")
+        except Exception as e:
+            con.rollback()
+            print("Failed to delete customer info from lovestogoto table")
+            print (">>>>>>>>>>>>>", e)
         #adding in old customer
-        query = "INSERT INTO oldcustomer(cid) VALUES('%s')" %(name)
-        cur.execute(query)
-        con.commit()
+                #delete from customer table
+        try:
+            query = "DELETE FROM customer WHERE cid=%d" %(cid)
+            cur.execute(query)
+            con.commit()
+            print("Deleted customer info from customer table")
+
+        except Exception as e:
+            #pass
+            con.rollback()
+            print("Failed to delete customer from customer table")
+            print (">>>>>>>>>>>>>", e)
+        
+        try:
+            query = "INSERT INTO oldcust(fname) VALUES('%s')" %(name)
+            cur.execute(query)
+            con.commit()
+            print("Inserted customer into deleted customer table")
+        except Exception as e:
+            #pass
+            con.rollback()
+            print("Failed to add customer into old customer table")
+            print (">>>>>>>>>>>>>", e)
 
 
     except Exception as e:
@@ -77,15 +110,16 @@ def deleteuser():
 
 def modifycustomer():
     try:
-        cid = input("Enter the Customer ID : ")
-        field = input("Enter the Attribute to modify : ")
+        cid = int(input("Enter the Customer ID : "))
+        field = str(input("Enter the Attribute to modify : "))
         if field=="cid":
             print("Can't Change cid : It is Primary Key")
             return
-        value = input("Enter the Attribute Value")
-        data = (field, value,cid)
-        query = "UPDATE customer SET %s=%s WHERE cid=%d"
-        cur.execute(query,data)
+        value = input("Enter the Attribute Value : ")
+        print("field: ",field)
+        print("value: ",value)
+        query = "UPDATE `customer` SET %s='%s' WHERE cid=%d" %(field,value,cid)
+        cur.execute(query)
         con.commit()
     except Exception as e:
         con.rollback()
@@ -104,7 +138,7 @@ def modifybar():
             return
         value = input("Enter the Attribute Value")
         data = (field, value,bid)
-        query = "UPDATE bar SET %s=%s WHERE cid=%d"
+        query = "UPDATE bar SET %s='%s' WHERE cid=%d"
         cur.execute(query,data)
         con.commit()
     except Exception as e:
@@ -139,24 +173,40 @@ def modifyBarManager():
 
 
 def cust_report():
-    query = "SELECT * FROM customer"
-    cur.execute(query,data)
-    data = cur.fetchall()
-    print(data)
+    try:
+        query = "SELECT * FROM customer"
+        cur.execute(query)
+        data = cur.fetchall()
+        for x in data:
+            print(x)
+    except:
+        con.rollback()
+        print("Failed to Generate report of customers")
+        print (">>>>>>>>>>>>>", e)
 
 def bar_report():
-    query = "SELECT * FROM bar"
-    cur.execute(query,data)
-    data = cur.fetchall()
-    print(data)
+    try:
+        query = "SELECT * FROM bar"
+        cur.execute(query)
+        data = cur.fetchall()
+        for x in data:
+            print(x)
+    except:
+        con.rollback()
+        print("Failed to Generate report of bars")
+        print (">>>>>>>>>>>>>", e)
 
 def old_cust_report():
-    query = "SELECT * FROM old_customer"
-    cur.execute(query,data)
-    data = cur.fetchall()
-    print(data)
-
-
+    try:
+        query = "SELECT * FROM oldcust"
+        cur.execute(query)
+        data = cur.fetchall()
+        for x in data:
+            print(x)
+    except:
+        con.rollback()
+        print("Failed to Generate report of old customers")
+        print (">>>>>>>>>>>>>", e)
 
 
 def callfunc(ch):
@@ -197,7 +247,7 @@ while(1):
         con = pymysql.connect(host='localhost',
                 user=username,
                 password=password,
-                db='COMPANY',
+                db='BAR',
                 cursorclass=pymysql.cursors.DictCursor)
         tmp = sp.call('clear',shell=True)
         with con:
@@ -215,7 +265,7 @@ while(1):
                 print("9. Logout")
                 ch = int(input("Enter Choice > "))
                 tmp = sp.call('clear', shell=True)
-                if ch==6:
+                if ch==9:
                     break
                 else:
                     callfunc(ch)
